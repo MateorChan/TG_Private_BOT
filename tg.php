@@ -6,6 +6,7 @@ const REDIS_SERVER = '127.0.0.1'; //  redis主机
 const REDIS_PORT = 6379;  //  redis端口
 const API_HOST = 'http://127.0.0.1:8081'; //  API地址，推荐自己搭建local server，才可以下载大文件
 const BOT_TOKEN = ''; //  bot的token
+const SAVE_PREFIX = '/webdata/TG/';  //  下载完成后的保存地址
 
 function doCurl($url, $params)
 {
@@ -92,19 +93,19 @@ function getFile($fileName, $fileId, $messageId, $fileUnique, $retry = 0)
     }
   }
   //  判断文件是否存在
-  if (file_exists('/webdata/remoteSync/TG/' . $fileName)) {
+  if (file_exists(SAVE_PREFIX . $fileName)) {
     //  判断文件是否相同
-    if (md5_file($res['result']['file_path'] . $fileName) === md5_file('/webdata/remoteSync/TG/' . $fileName)) {
+    if (md5_file($res['result']['file_path'] . $fileName) === md5_file(SAVE_PREFIX . $fileName)) {
       // 文件相同，删除文件
       unlink($res['result']['file_path']);
     } else {
       //  文件不相同，重命名文件
-      copy($res['result']['file_path'], '/webdata/remoteSync/TG/' . randStr(4) . $fileName);
+      copy($res['result']['file_path'], SAVE_PREFIX . randStr(4) . $fileName);
       unlink($res['result']['file_path']);
     }
   } else {
     //  保存文件
-    copy($res['result']['file_path'], '/webdata/remoteSync/TG/' . $fileName);
+    copy($res['result']['file_path'], SAVE_PREFIX . $fileName);
     unlink($res['result']['file_path']);
   }
   return deleteMessage($messageId);
